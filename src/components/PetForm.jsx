@@ -1,44 +1,188 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { generateId } from '../utils/generateId';
 
-const PetForm = () => {
+const PetForm = ({ saveDate, editDate, editDatePet, setEditDate }) => {
+  const [pet, setPet] = useState({
+    id: generateId(),
+    namePet: "",
+    agePet: "",
+    breedPet: "",
+    nameOwner: "",
+    email: "",
+    symptoms: "",
+    datePet: "",
+    error: false,
+  });
+
+  const handleChange = (event) => {
+    setPet({
+      ...pet,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const {
+    namePet,
+    agePet,
+    breedPet,
+    nameOwner,
+    email,
+    symptoms,
+    datePet,
+    error,
+  } = pet;
+
+  useEffect(() => {
+    if (Object.keys(editDate).length > 0) {
+      setPet(editDate);
+    }
+    console.log(editDate);
+  }, [editDate])
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if ([namePet, agePet, breedPet, nameOwner, email, symptoms, datePet].includes("")) {
+      setPet({
+        ...pet,
+        error: true,
+      });
+      toast.warn("Todos los campos son obligatorios", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+    }
+    setPet({
+      ...pet,
+      error: false,
+    });
+
+    if (editDate.id) {
+      editDatePet(pet);
+      setEditDate({});
+    } else {
+      saveDate(pet);
+    }
+
+    setPet({
+      ...pet,
+      id: generateId(),
+      namePet: "",
+      agePet: "",
+      breedPet: "",
+      nameOwner: "",
+      email: "",
+      symptoms: "",
+      datePet: "",
+    });
+
+  };
+
   return (
     <>
       <h2 className="text-center font-bold">Formulario</h2>
-      <form className="flex flex-col sm:flex-col w-full">
-        <label htmlFor="namePet" className="font-bold">Nombre mascota</label>
+      {error && (
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      )}
+      <form
+        className="flex flex-col sm:flex-col w-full"
+        onSubmit={handleSubmit}
+      >
+        <label htmlFor="namePet" className="font-bold">
+          Nombre mascota
+        </label>
         <input
           type="text"
           className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
           placeholder="Nombre de la mascota"
-          name="namPet"
+          value={namePet}
+          name="namePet"
+          onChange={handleChange}
         />
-        <label htmlFor="egePet"  className="font-bold">Edad mascota</label>
+        <label htmlFor="egePet">
+          <span className="font-bold text-inherit">Edad mascota</span> (dias,
+          semanas, meses o años)
+        </label>
         <input
-          type="number"
+          type="text"
           className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
           placeholder="Edad de la mascota"
           name="agePet"
+          value={agePet}
+          onChange={handleChange}
         />
-        <label htmlFor="breedPet"  className="font-bold">Raza</label>
+        <label htmlFor="breedPet" className="font-bold">
+          Raza
+        </label>
         <input
           type="text"
           className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
           placeholder="Raza de la mascota"
           name="breedPet"
+          value={breedPet}
+          onChange={handleChange}
         />
-        <label htmlFor="nameOwner" className="font-bold">Nombre dueño</label>
-        <input type="text" className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm" placeholder="Nombre del dueño" name="namOwner"  required/>
-        <label htmlFor="email" className="font-bold">Email</label>
-        <input type="email" className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm" placeholder="Email" name="email" />
-        <label htmlFor="symptoms" className="font-bold">Sintomas</label>
+        <label htmlFor="nameOwner" className="font-bold">
+          Nombre dueño
+        </label>
+        <input
+          type="text"
+          className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+          placeholder="Nombre del dueño"
+          name="nameOwner"
+          value={nameOwner}
+          onChange={handleChange}
+        />
+        <label htmlFor="email" className="font-bold">
+          Email
+        </label>
+        <input
+          type="email"
+          className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+          placeholder="Email"
+          name="email"
+          value={email}
+          onChange={handleChange}
+        />
+        <label htmlFor="symptoms" className="font-bold">
+          Sintomas
+        </label>
         <textarea
           name="symptoms"
           id="symptoms"
           className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
           placeholder="Sintomas"
+          value={symptoms}
+          onChange={handleChange}
         ></textarea>
-        <label htmlFor="datePet" className="font-bold">Fecha</label>
-        <input type="date" className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm" placeholder="Fecha" name="datePet" />
+        <label htmlFor="datePet" className="font-bold">
+          Fecha
+        </label>
+        <input
+          type="date"
+          className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+          placeholder="Fecha"
+          name="datePet"
+          value={datePet}
+          onChange={handleChange}
+        />
         <button
           type="submit"
           className=" font-bold uppercase bg-indigo-600 py-2 rounded-lg text-cyan-100 hover:bg-indigo-500 mt-3 mb-3"
